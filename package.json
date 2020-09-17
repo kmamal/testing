@@ -1,12 +1,14 @@
 {
   "version": "0.0.1",
   "name": "@xyz/testing",
-  "description": "tests",
+  "description": "testing",
   "repository": {
     "type": "git",
     "url": "git:repos/testing"
   },
   "main": "src/index.js",
   "license": "ISC",
-  "dependencies": {}
+  "dependencies": {
+    "@xyz/util": "git:repos/util#semver:*"
+  }
 }
