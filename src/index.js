@@ -1,8 +1,6 @@
 const Path = require('path')
-const {
-	object: { isEqual },
-	promise: { timeout },
-} = require('@xyz/util')
+const { isEqual } = require('@xyz/util/object')
+const { timeout } = require('@xyz/util/promise')
 
 let count_files = 0
 let count_tests = 0
