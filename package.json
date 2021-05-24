@@ -9,6 +9,6 @@
   "main": "src/index.js",
   "license": "MIT",
   "dependencies": {
-    "@kmamal/util": "git@github.com:kmamal/util.git#semver:*"
+    "@kmamal/util": "kmamal/util.git#semver:*"
   }
 }
