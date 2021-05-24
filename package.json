@@ -1,14 +1,14 @@
 {
   "version": "0.0.4",
-  "name": "@xyz/testing",
+  "name": "@kmamal/testing",
   "description": "testing",
   "repository": {
     "type": "git",
-    "url": "git:repos/testing"
+    "url": "git@github.com:kmamal/testing.git"
   },
   "main": "src/index.js",
-  "license": "ISC",
+  "license": "MIT",
   "dependencies": {
-    "@xyz/util": "git:repos/util#semver:*"
+    "@kmamal/util": "git@github.com:kmamal/util.git#semver:*"
   }
 }
