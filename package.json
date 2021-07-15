@@ -9,6 +9,6 @@
   "main": "src/index.js",
   "license": "MIT",
   "dependencies": {
-    "@kmamal/util": "^0.0.41"
+    "@kmamal/util": "^0.0.43"
   }
 }
