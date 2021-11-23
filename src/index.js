@@ -2,13 +2,13 @@ const Path = require('path')
 const { isEqual } = require('@kmamal/util/object/is-equal')
 const { timeout } = require('@kmamal/util/promise/timeout')
 
-let count_files = 0
-let count_tests = 0
-let count_failed = 0
+let countFiles = 0
+let countTests = 0
+let countFailed = 0
 
 const stack = []
 let running = false
-let files_done = false
+let filesDone = false
 
 const appendTest = (name, callback) => {
 	stack.push({ name, callback })
@@ -20,14 +20,14 @@ const appendTest = (name, callback) => {
 }
 
 const runTest = async (callback) => {
-	count_tests += 1
+	countTests += 1
 
 	let error = null
 	let duration = 500
-	let count_expected = null
-	let count_actual = 0
+	let countExpected = null
+	let countActual = 0
 	let schedule = null
-	let start_time = null
+	let startTime = null
 
 	try {
 		if (callback === undefined) {
@@ -37,8 +37,8 @@ const runTest = async (callback) => {
 
 		const promise = callback({
 			expect: (n) => {
-				count_expected = n
-				count_actual = 0
+				countExpected = n
+				countActual = 0
 			},
 			timeout: (t) => { duration = t },
 			//
@@ -47,9 +47,9 @@ const runTest = async (callback) => {
 				const tollerance = options.tollerance || 20
 				const propagate = options.propagate || true
 				return {
-					start: () => { start_time = Date.now() },
+					start: () => { startTime = Date.now() },
 					step: (x) => {
-						const elapsed = Date.now() - start_time
+						const elapsed = Date.now() - startTime
 
 						if (schedule.length === 0) {
 							const err = new Error("no steps left")
@@ -74,28 +74,32 @@ const runTest = async (callback) => {
 							throw err
 						}
 
-						if (propagate) { start_time += diff }
+						if (propagate) { startTime += diff }
 					},
 				}
 			},
 			//
 			ok: (value, info) => {
-				count_actual += 1
+				countActual += 1
 				if (value) { return }
 				const err = new Error("not ok")
 				info && Object.assign(err, info)
 				throw err
 			},
-			assert: (cb, info) => {
-				count_actual += 1
-				if (cb()) { return }
-				const err = new Error("assertion failed")
-				info && Object.assign(err, info)
-				err.callback = cb.toString()
-				throw err
+			throwsNot: (cb, info) => {
+				countActual += 1
+				try {
+					cb()
+				} catch (_err) {
+					const err = new Error("did throw")
+					info && Object.assign(err, info)
+					err.callback = cb.toString()
+					err.error = _err
+					throw err
+				}
 			},
 			throws: async (cb, info) => {
-				count_actual += 1
+				countActual += 1
 				try {
 					await cb()
 				} catch (expected) { return }
@@ -105,7 +109,7 @@ const runTest = async (callback) => {
 				throw err
 			},
 			equal: (actual, expected, info) => {
-				count_actual += 1
+				countActual += 1
 				if (isEqual(actual, expected)) { return }
 				const err = new Error("not equal")
 				info && Object.assign(err, info)
@@ -124,7 +128,7 @@ const runTest = async (callback) => {
 		})
 
 		if (promise) {
-			const handleError = (err) => { error = error || err }
+			const handleError = (err) => { error = error ?? err }
 			process.on('unhandledRejection', handleError)
 			process.on('uncaughtException', handleError)
 			await Promise.race([ promise, timeout(duration) ])
@@ -132,10 +136,10 @@ const runTest = async (callback) => {
 			process.off('uncaughtException', handleError)
 		}
 
-		if (count_expected !== null && count_actual !== count_expected) {
+		if (countExpected !== null && countActual !== countExpected) {
 			const err = new Error("wrong number")
-			err.expected = count_expected
-			err.actual = count_actual
+			err.expected = countExpected
+			err.actual = countActual
 			throw err
 		}
 
@@ -145,7 +149,7 @@ const runTest = async (callback) => {
 			throw err
 		}
 	} catch (err) {
-		error = error || err
+		error = error ?? err
 	}
 
 	return error
@@ -173,18 +177,18 @@ const runTests = async () => {
 
 		if (error) {
 			args.push("->", error)
-			count_failed += 1
+			countFailed += 1
 		}
 
 		console.log(...args)
 	}
 
-	if (files_done) {
-		console.log(`files: ${count_files}`)
-		console.log(`tests: ${count_tests}`)
-		console.log(`failed: ${count_failed}`)
+	if (filesDone) {
+		console.log(`files: ${countFiles}`)
+		console.log(`tests: ${countTests}`)
+		console.log(`failed: ${countFailed}`)
 
-		process.exit(count_failed > 0 ? 1 : 0)
+		process.exit(countFailed > 0 ? 1 : 0)
 	}
 
 	running = false
@@ -197,11 +201,11 @@ module.exports = { test: appendTest }
 const [ , , ...paths ] = process.argv
 
 for (const path of paths) {
-	count_files += 1
+	countFiles += 1
 
 	stack.push(path)
 	require(Path.resolve(path))
 	stack.push(null)
 }
 
-files_done = true
+filesDone = true
