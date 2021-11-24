@@ -98,7 +98,29 @@ const runTest = async (callback) => {
 					throw err
 				}
 			},
-			throws: async (cb, info) => {
+			throwsNotAsync: async (cb, info) => {
+				countActual += 1
+				try {
+					await cb()
+				} catch (_err) {
+					const err = new Error("did throw")
+					info && Object.assign(err, info)
+					err.callback = cb.toString()
+					err.error = _err
+					throw err
+				}
+			},
+			throws: (cb, info) => {
+				countActual += 1
+				try {
+					cb()
+				} catch (expected) { return }
+				const err = new Error("didn't throw")
+				info && Object.assign(err, info)
+				err.callback = cb.toString()
+				throw err
+			},
+			throwsAsync: async (cb, info) => {
 				countActual += 1
 				try {
 					await cb()
@@ -108,12 +130,25 @@ const runTest = async (callback) => {
 				err.callback = cb.toString()
 				throw err
 			},
-			throwsWith: async (cb, assert, info) => {
+			throwsWith: (cb, assert, info) => {
+				countActual += 1
+				try {
+					cb()
+				} catch (expected) {
+					assert(expected)
+					return
+				}
+				const err = new Error("didn't throw")
+				info && Object.assign(err, info)
+				err.callback = cb.toString()
+				throw err
+			},
+			throwsWithAsync: async (cb, assert, info) => {
 				countActual += 1
 				try {
 					await cb()
 				} catch (expected) {
-					assert(expected)
+					await assert(expected)
 					return
 				}
 				const err = new Error("didn't throw")
