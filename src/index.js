@@ -108,6 +108,19 @@ const runTest = async (callback) => {
 				err.callback = cb.toString()
 				throw err
 			},
+			throwsWith: async (cb, assert, info) => {
+				countActual += 1
+				try {
+					await cb()
+				} catch (expected) {
+					assert(expected)
+					return
+				}
+				const err = new Error("didn't throw")
+				info && Object.assign(err, info)
+				err.callback = cb.toString()
+				throw err
+			},
 			equal: (actual, expected, info) => {
 				countActual += 1
 				if (isEqual(actual, expected)) { return }
