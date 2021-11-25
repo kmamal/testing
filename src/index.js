@@ -48,29 +48,29 @@ const runTest = async (callback) => {
 				const propagate = options.propagate || true
 				return {
 					start: () => { startTime = Date.now() },
-					step: (x) => {
+					step: (...x) => {
 						const elapsed = Date.now() - startTime
 
 						if (schedule.length === 0) {
 							const err = new Error("no steps left")
-							err.step = [ elapsed, x ]
+							err.step = [ elapsed, ...x ]
 							throw err
 						}
 
-						const [ time, value ] = schedule.shift()
+						const [ time, ...value ] = schedule.shift()
 
 						if (!isEqual(value, x)) {
 							const err = new Error("unexpected step")
-							err.expected = [ time, value ]
-							err.actual = [ elapsed, x ]
+							err.expected = [ time, ...value ]
+							err.actual = [ elapsed, ...x ]
 							throw err
 						}
 
 						const diff = elapsed - time
 						if (Math.abs(diff) > tollerance) {
 							const err = new Error("bad timing")
-							err.expected = [ time, value ]
-							err.actual = [ elapsed, x ]
+							err.expected = [ time, ...value ]
+							err.actual = [ elapsed, ...x ]
 							throw err
 						}
 
