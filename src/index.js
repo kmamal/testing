@@ -1,4 +1,5 @@
 const Path = require('path')
+const Util = require('util')
 const { isEqual } = require('@kmamal/util/object/is-equal')
 const { timeout } = require('@kmamal/util/promise/timeout')
 
@@ -224,7 +225,12 @@ const runTests = async () => {
 		const args = [ name ]
 
 		if (error) {
-			args.push("->", error)
+			args.push("->", Util.inspect(error, {
+				depth: Infinity,
+				colors: true,
+				breakLength: process.stdout.columns,
+				sorted: true,
+			}))
 			countFailed += 1
 		}
 
