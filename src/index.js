@@ -36,6 +36,10 @@ const runTest = async (callback) => {
 			throw error
 		}
 
+		const handleError = (err) => { error = error ?? err }
+		process.on('unhandledRejection', handleError)
+		process.on('uncaughtException', handleError)
+
 		const promise = callback({
 			expect: (n) => {
 				countExpected = n
@@ -177,13 +181,11 @@ const runTest = async (callback) => {
 		})
 
 		if (promise) {
-			const handleError = (err) => { error = error ?? err }
-			process.on('unhandledRejection', handleError)
-			process.on('uncaughtException', handleError)
 			await Promise.race([ promise, timeout(duration) ])
-			process.off('unhandledRejection', handleError)
-			process.off('uncaughtException', handleError)
 		}
+
+		process.off('unhandledRejection', handleError)
+		process.off('uncaughtException', handleError)
 
 		if (countExpected !== null && countActual !== countExpected) {
 			const err = new Error("wrong number")
