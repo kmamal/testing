@@ -24,6 +24,7 @@ const runTest = async (callback) => {
 	countTests += 1
 
 	let error = null
+	let shouldSortKeys = false
 	let duration = 500
 	let countExpected = null
 	let countActual = 0
@@ -84,18 +85,20 @@ const runTest = async (callback) => {
 				}
 			},
 			//
-			ok: (value, info) => {
+			ok: (value, info, sort = false) => {
 				countActual += 1
 				if (value) { return }
+				shouldSortKeys = sort
 				const err = new Error("not ok")
 				info && Object.assign(err, info)
 				throw err
 			},
-			throwsNot: (cb, info) => {
+			throwsNot: (cb, info, sort = false) => {
 				countActual += 1
 				try {
 					cb()
 				} catch (_err) {
+					shouldSortKeys = sort
 					const err = new Error("did throw")
 					info && Object.assign(err, info)
 					err.callback = cb.toString()
@@ -103,11 +106,12 @@ const runTest = async (callback) => {
 					throw err
 				}
 			},
-			throwsNotAsync: async (cb, info) => {
+			throwsNotAsync: async (cb, info, sort = false) => {
 				countActual += 1
 				try {
 					await cb()
 				} catch (_err) {
+					shouldSortKeys = sort
 					const err = new Error("did throw")
 					info && Object.assign(err, info)
 					err.callback = cb.toString()
@@ -115,27 +119,29 @@ const runTest = async (callback) => {
 					throw err
 				}
 			},
-			throws: (cb, info) => {
+			throws: (cb, info, sort = false) => {
 				countActual += 1
 				try {
 					cb()
 				} catch (expected) { return }
+				shouldSortKeys = sort
 				const err = new Error("didn't throw")
 				info && Object.assign(err, info)
 				err.callback = cb.toString()
 				throw err
 			},
-			throwsAsync: async (cb, info) => {
+			throwsAsync: async (cb, info, sort = false) => {
 				countActual += 1
 				try {
 					await cb()
 				} catch (expected) { return }
+				shouldSortKeys = sort
 				const err = new Error("didn't throw")
 				info && Object.assign(err, info)
 				err.callback = cb.toString()
 				throw err
 			},
-			throwsWith: (cb, assert, info) => {
+			throwsWith: (cb, assert, info, sort = false) => {
 				countActual += 1
 				try {
 					cb()
@@ -143,12 +149,13 @@ const runTest = async (callback) => {
 					assert(expected)
 					return
 				}
+				shouldSortKeys = sort
 				const err = new Error("didn't throw")
 				info && Object.assign(err, info)
 				err.callback = cb.toString()
 				throw err
 			},
-			throwsWithAsync: async (cb, assert, info) => {
+			throwsWithAsync: async (cb, assert, info, sort = false) => {
 				countActual += 1
 				try {
 					await cb()
@@ -156,14 +163,16 @@ const runTest = async (callback) => {
 					await assert(expected)
 					return
 				}
+				shouldSortKeys = sort
 				const err = new Error("didn't throw")
 				info && Object.assign(err, info)
 				err.callback = cb.toString()
 				throw err
 			},
-			equal: (actual, expected, info) => {
+			equal: (actual, expected, info, sort = false) => {
 				countActual += 1
 				if (isEqual(actual, expected)) { return }
+				shouldSortKeys = sort
 				const err = new Error("not equal")
 				info && Object.assign(err, info)
 				err.expected = expected
@@ -203,7 +212,7 @@ const runTest = async (callback) => {
 		error = error ?? err
 	}
 
-	return error
+	return { error, shouldSortKeys }
 }
 
 const runTests = async () => {
@@ -222,7 +231,7 @@ const runTests = async () => {
 		}
 
 		const { name, callback } = item
-		const error = await runTest(callback)
+		const { error, shouldSortKeys } = await runTest(callback)
 
 		const args = [ name ]
 
@@ -231,7 +240,7 @@ const runTests = async () => {
 				depth: Infinity,
 				colors: true,
 				breakLength: process.stdout.columns,
-				sorted: true,
+				sorted: shouldSortKeys,
 			}))
 			countFailed += 1
 		}
