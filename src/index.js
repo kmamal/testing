@@ -174,9 +174,9 @@ const runTest = async (callback) => {
 				if (isEqual(actual, expected)) { return }
 				shouldSortKeys = sort
 				const err = new Error("not equal")
+				info && Object.assign(err, info)
 				err.expected = expected
 				err.actual = actual
-				info && Object.assign(err, info)
 				throw err
 			},
 			fail: (info) => {
