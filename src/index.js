@@ -20,6 +20,7 @@ const appendTest = (name, callback) => {
 	process.nextTick(runTests)
 }
 
+let count = 0
 const runTest = async (callback) => {
 	countTests += 1
 
@@ -31,15 +32,15 @@ const runTest = async (callback) => {
 	let schedule = null
 	let startTime = null
 
+	const handleError = (err) => { error ??= err }
+	process.on('unhandledRejection', handleError)
+	process.on('uncaughtException', handleError)
+
 	try {
 		if (callback === undefined) {
 			error = "NOT IMPLEMENTED"
 			throw error
 		}
-
-		const handleError = (err) => { error = error ?? err }
-		process.on('unhandledRejection', handleError)
-		process.on('uncaughtException', handleError)
 
 		const promise = callback({
 			expect: (n) => {
@@ -193,9 +194,6 @@ const runTest = async (callback) => {
 			await Promise.race([ promise, timeout(duration) ])
 		}
 
-		process.off('unhandledRejection', handleError)
-		process.off('uncaughtException', handleError)
-
 		if (countExpected !== null && countActual !== countExpected) {
 			const err = new Error("wrong number")
 			err.expected = countExpected
@@ -209,7 +207,10 @@ const runTest = async (callback) => {
 			throw err
 		}
 	} catch (err) {
-		error = error ?? err
+		error ??= err
+	} finally {
+		process.off('unhandledRejection', handleError)
+		process.off('uncaughtException', handleError)
 	}
 
 	return { error, shouldSortKeys }
