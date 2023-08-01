@@ -1,0 +1,12 @@
+#!/usr/bin/env node
+
+const { Matcher } = require('@kmamal/globs/matcher')
+const { defaultRunner } = require('../src/runner')
+
+;(async () => {
+	const matcher = new Matcher('**/*.test.js')
+	for await (const file of matcher.getFiles()) {
+		defaultRunner.appendFile(file)
+	}
+	defaultRunner.finish()
+})()
