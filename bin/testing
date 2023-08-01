@@ -3,10 +3,14 @@
 const { Matcher } = require('@kmamal/globs/matcher')
 const { defaultRunner } = require('../src/runner')
 
+const matcher = new Matcher([
+	'**/*.test.js',
+	'!node_modules/',
+])
+
 ;(async () => {
-	const matcher = new Matcher('**/*.test.js')
 	for await (const file of matcher.getFiles()) {
-		defaultRunner.appendFile(file)
+		defaultRunner.appendFile(file.path)
 	}
 	defaultRunner.finish()
 })()
