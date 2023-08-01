@@ -6,6 +6,7 @@
     "type": "git",
     "url": "git@github.com:kmamal/testing.git"
   },
+  "bin": "./bin/testing",
   "main": "./src/index.js",
   "exports": "./src/index.js",
   "license": "MIT",
