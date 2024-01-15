@@ -183,6 +183,16 @@ class TestRunner {
 					err.actual = actual
 					throw err
 				},
+				notEqual: (actual, expected, info, sort = false) => {
+					countActual += 1
+					if (!isEqual(actual, expected)) { return }
+					shouldSortKeys = sort
+					const err = new Error("equal")
+					info && Object.assign(err, info)
+					err.expected = expected
+					err.actual = actual
+					throw err
+				},
 				fail: (info) => {
 					const err = new Error("failed")
 					info && Object.assign(err, info)
@@ -263,11 +273,22 @@ class TestRunner {
 		this.running = false
 	}
 
-	appendFile (path) {
+	async appendFile (path) {
 		this.countFiles += 1
 
 		this.stack.push(path)
-		require(Path.resolve(path))
+
+		const resolved = Path.resolve(path)
+		try {
+			require(resolved)
+		} catch (error) {
+			if (error.code === 'ERR_REQUIRE_ESM') {
+				await import(resolved)
+			} else {
+				throw error
+			}
+		}
+
 		this.stack.push(null)
 	}
 
