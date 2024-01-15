@@ -5,6 +5,7 @@ const { defaultRunner } = require('../src/runner')
 
 const matcher = new Matcher([
 	'**/*.test.js',
+	'**/*.test.mjs',
 	'!node_modules/',
 ])
 
