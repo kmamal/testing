@@ -11,7 +11,7 @@ const matcher = new Matcher([
 
 ;(async () => {
 	for await (const file of matcher.getFiles()) {
-		defaultRunner.appendFile(file.path)
+		await defaultRunner.appendFile(file.path)
 	}
 	defaultRunner.finish()
 })()
