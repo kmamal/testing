@@ -11,7 +11,7 @@
   "exports": "./src/index.js",
   "license": "MIT",
   "dependencies": {
-    "@kmamal/globs": "^0.0.1",
-    "@kmamal/util": "^0.0.43"
+    "@kmamal/globs": "^0.0.4",
+    "@kmamal/util": "^0.1.14"
   }
 }
