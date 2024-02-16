@@ -3,11 +3,15 @@
 const { Matcher } = require('@kmamal/globs/matcher')
 const { defaultRunner } = require('../src/runner')
 
-const matcher = new Matcher([
+const patterns = process.argv.slice(2)
+
+const defaultPatterns = [
 	'**/*.test.js',
 	'**/*.test.mjs',
 	'!node_modules/',
-])
+]
+
+const matcher = new Matcher(patterns.length > 0 ? patterns : defaultPatterns)
 
 ;(async () => {
 	for await (const file of matcher.getFiles()) {
