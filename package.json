@@ -4,7 +4,7 @@
   "description": "testing",
   "repository": {
     "type": "git",
-    "url": "git@github.com:kmamal/testing.git"
+    "url": "git+ssh://git@github.com:kmamal/testing.git"
   },
   "bin": "./bin/testing",
   "main": "./src/index.js",
@@ -12,6 +12,6 @@
   "license": "MIT",
   "dependencies": {
     "@kmamal/globs": "^0.0.4",
-    "@kmamal/util": "^0.1.14"
+    "@kmamal/util": "^0.2.0"
   }
 }
