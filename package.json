@@ -12,6 +12,6 @@
   "license": "MIT",
   "dependencies": {
     "@kmamal/globs": "^0.0.4",
-    "@kmamal/util": "^0.2.0"
+    "@kmamal/util": "^0.2.24"
   }
 }

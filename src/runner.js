@@ -127,7 +127,7 @@ class TestRunner {
 					countActual += 1
 					try {
 						cb()
-					} catch (expected) { return }
+					} catch (_) { return }
 					shouldSortKeys = sort
 					const err = new Error("didn't throw")
 					info && Object.assign(err, info)
@@ -138,7 +138,7 @@ class TestRunner {
 					countActual += 1
 					try {
 						await cb()
-					} catch (expected) { return }
+					} catch (_) { return }
 					shouldSortKeys = sort
 					const err = new Error("didn't throw")
 					info && Object.assign(err, info)
@@ -282,7 +282,7 @@ class TestRunner {
 		try {
 			require(resolved)
 		} catch (error) {
-			if (error.code === 'ERR_REQUIRE_ESM') {
+			if (error.code === 'ERR_REQUIRE_ESM' || error.code === 'ERR_REQUIRE_ASYNC_MODULE') {
 				await import(resolved)
 			} else {
 				throw error
