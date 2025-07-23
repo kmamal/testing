@@ -18,9 +18,6 @@ class TestRunner {
 	appendTest (name, callback) {
 		this.stack.push({ name, callback })
 
-		if (this.running) { return }
-		this.running = true
-
 		process.nextTick(() => this.runTests())
 	}
 
@@ -101,7 +98,8 @@ class TestRunner {
 					countActual += 1
 					try {
 						cb()
-					} catch (_err) {
+					}
+					catch (_err) {
 						shouldSortKeys = sort
 						const err = new Error("did throw")
 						info && Object.assign(err, info)
@@ -114,7 +112,8 @@ class TestRunner {
 					countActual += 1
 					try {
 						await cb()
-					} catch (_err) {
+					}
+					catch (_err) {
 						shouldSortKeys = sort
 						const err = new Error("did throw")
 						info && Object.assign(err, info)
@@ -127,7 +126,8 @@ class TestRunner {
 					countActual += 1
 					try {
 						cb()
-					} catch (_) { return }
+					}
+					catch (_) { return }
 					shouldSortKeys = sort
 					const err = new Error("didn't throw")
 					info && Object.assign(err, info)
@@ -138,7 +138,8 @@ class TestRunner {
 					countActual += 1
 					try {
 						await cb()
-					} catch (_) { return }
+					}
+					catch (_) { return }
 					shouldSortKeys = sort
 					const err = new Error("didn't throw")
 					info && Object.assign(err, info)
@@ -149,7 +150,8 @@ class TestRunner {
 					countActual += 1
 					try {
 						cb()
-					} catch (expected) {
+					}
+					catch (expected) {
 						assert(expected)
 						return
 					}
@@ -163,7 +165,8 @@ class TestRunner {
 					countActual += 1
 					try {
 						await cb()
-					} catch (expected) {
+					}
+					catch (expected) {
 						await assert(expected)
 						return
 					}
@@ -219,9 +222,11 @@ class TestRunner {
 				err.steps = schedule
 				throw err
 			}
-		} catch (err) {
+		}
+		catch (err) {
 			error ??= err
-		} finally {
+		}
+		finally {
 			process.off('unhandledRejection', handleError)
 			process.off('uncaughtException', handleError)
 		}
@@ -230,6 +235,9 @@ class TestRunner {
 	}
 
 	async runTests () {
+		if (this.running) { return }
+		this.running = true
+
 		while (this.stack.length > 0) {
 			const item = this.stack.shift()
 
@@ -281,10 +289,12 @@ class TestRunner {
 		const resolved = Path.resolve(path)
 		try {
 			require(resolved)
-		} catch (error) {
+		}
+		catch (error) {
 			if (error.code === 'ERR_REQUIRE_ESM' || error.code === 'ERR_REQUIRE_ASYNC_MODULE') {
 				await import(resolved)
-			} else {
+			}
+			else {
 				throw error
 			}
 		}
