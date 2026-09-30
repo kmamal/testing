@@ -1,4 +1,4 @@
-const Path = require('path')
+const Path = require('node:path')
 const Util = require('util')
 const { isEqual } = require('@kmamal/util/object/is-equal')
 const { timeout } = require('@kmamal/util/promise/timeout')
@@ -12,12 +12,14 @@ class TestRunner {
 
 		this.stack = []
 		this.running = false
+		this.loading = false
 		this.filesDone = false
 	}
 
 	appendTest (name, callback) {
 		this.stack.push({ name, callback })
 
+		if (this.loading) { return }
 		process.nextTick(() => this.runTests())
 	}
 
@@ -51,8 +53,8 @@ class TestRunner {
 				//
 				schedule: (steps, options = {}) => {
 					schedule = [ ...steps ]
-					const tollerance = options.tollerance || 20
-					const propagate = options.propagate || true
+					const tollerance = options.tollerance ?? 20
+					const propagate = options.propagate ?? true
 					return {
 						start: () => { startTime = Date.now() },
 						step: (...x) => {
@@ -282,6 +284,7 @@ class TestRunner {
 	}
 
 	async appendFile (path) {
+		this.loading = true
 		this.countFiles += 1
 
 		this.stack.push(path)
@@ -303,6 +306,7 @@ class TestRunner {
 	}
 
 	finish () {
+		this.loading = false
 		this.filesDone = true
 		this.runTests()
 	}
